@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>หลังบ้าน · ทุนการศึกษา โรงเรียนพังโคนวิทยาคม</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Sarabun', 'sans-serif'] } } } };</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===================== หน้าเข้าสู่ระบบ ===================== -->
+<section id="loginView" class="hidden">
+  <div class="hero-bg relative overflow-hidden min-h-screen flex items-center justify-center px-4">
+    <div class="blob w-80 h-80 bg-white -top-20 -left-20"></div>
+    <div class="blob w-96 h-96 bg-red-300 bottom-0 -right-24" style="animation-delay:-4s"></div>
+    <span class="bubble" style="left:12%;animation-delay:0s"></span>
+    <span class="bubble" style="left:40%;animation-delay:3s;width:18px;height:18px"></span>
+    <span class="bubble" style="left:75%;animation-delay:1.5s"></span>
+
+    <form id="loginForm" class="card relative z-10 w-full max-w-sm p-7 fade-up">
+      <div class="text-center mb-5">
+        <div class="text-5xl floaty">🎓</div>
+        <h1 class="text-xl font-bold text-red-800 mt-2">เข้าสู่ระบบหลังบ้าน</h1>
+        <p class="text-sm text-gray-500">ระบบทุนการศึกษา โรงเรียนพังโคนวิทยาคม</p>
+      </div>
+      <label class="lbl" for="email">อีเมล</label>
+      <input id="email" type="email" class="field mb-3" autocomplete="username" required>
+      <label class="lbl" for="password">รหัสผ่าน</label>
+      <input id="password" type="password" class="field mb-3" autocomplete="current-password" required>
+      <p id="loginErr" class="hidden text-sm text-red-600 mb-3"></p>
+      <button id="loginBtn" type="submit" class="btn-primary shine w-full">เข้าสู่ระบบ</button>
+      <a href="index.html" class="block text-center text-sm text-red-700 mt-4 hover:underline">← กลับหน้าแรก</a>
+    </form>
+  </div>
+</section>
+
+<!-- ===================== ยังไม่ได้รับสิทธิ์ ===================== -->
+<section id="pendingView" class="hidden">
+  <div class="hero-bg min-h-screen flex items-center justify-center px-4">
+    <div class="card w-full max-w-md p-7 text-center">
+      <div class="text-5xl">🔒</div>
+      <h2 class="text-xl font-bold text-red-800 mt-2">บัญชียังไม่ได้รับสิทธิ์ใช้งาน</h2>
+      <p class="text-gray-600 mt-2">กรุณาแจ้งผู้ดูแลระบบให้กำหนดสิทธิ์เป็น “ผู้ดูแลระบบ” หรือ “ครู” แล้วเข้าสู่ระบบใหม่</p>
+      <button id="pendingOut" class="btn-primary mt-5">ออกจากระบบ</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== แดชบอร์ด ===================== -->
+<section id="appView" class="hidden">
+  <header class="hero-bg text-white sticky top-0 z-40 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl floaty">🎓</span>
+        <div>
+          <div class="font-bold leading-tight">หลังบ้านทุนการศึกษา</div>
+          <div class="text-xs text-red-100">โรงเรียนพังโคนวิทยาคม</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 text-sm">
+        <a href="index.html" class="px-3 py-1.5 rounded-full hover:bg-white/20 transition">หน้าแรก</a>
+        <span id="who" class="hidden sm:inline font-semibold"></span>
+        <span id="roleBadge" class="px-2 py-0.5 rounded-full bg-white/25 text-xs"></span>
+        <button id="btnLogout" class="px-3 py-1.5 rounded-full bg-white text-red-700 font-semibold hover:bg-red-50 transition">ออกจากระบบ</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6">
+    <div class="flex flex-wrap gap-2 mb-5">
+      <button id="tabbtn-donors" class="tab-btn tab-active" data-tab="donors">💝 ผู้ให้ทุน</button>
+      <button id="tabbtn-recipients" class="tab-btn" data-tab="recipients">🎓 ผู้รับทุน</button>
+      <button id="tabbtn-reports" class="tab-btn" data-tab="reports">📄 รายงาน</button>
+      <button id="tabbtn-users" class="tab-btn hidden" data-tab="users">👥 ผู้ใช้งาน</button>
+    </div>
+
+    <!-- ---------- แท็บ: ผู้ให้ทุน ---------- -->
+    <div id="tab-donors">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+        <div class="stat"><b id="stDonors">0</b><span>ผู้ให้ทุน (คน)</span></div>
+        <div class="stat"><b id="stTotal">0</b><span>ยอดทุนรวม (บาท)</span></div>
+        <div class="stat"><b id="stUsed">0</b><span>จัดสรรแล้ว (บาท)</span></div>
+        <div class="stat"><b id="stRemain">0</b><span>คงเหลือ (บาท)</span></div>
+      </div>
+      <div class="card overflow-hidden">
+        <div class="p-4 flex flex-wrap items-center justify-between gap-3 border-b border-red-100">
+          <h2 class="font-bold text-red-800 text-lg">รายชื่อผู้ให้ทุน</h2>
+          <button id="btnAddDonor" class="btn-primary">+ เพิ่มผู้ให้ทุน</button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="tbl">
+            <thead><tr>
+              <th class="text-center" style="width:56px">ที่</th><th>ชื่อ - สกุล</th>
+              <th class="text-right">ยอดทุน</th><th class="text-right">จัดสรรแล้ว</th><th class="text-right">คงเหลือ</th>
+              <th style="min-width:110px">สัดส่วน</th><th>หมายเหตุ</th><th class="text-right">จัดการ</th>
+            </tr></thead>
+            <tbody id="donorBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------- แท็บ: ผู้รับทุน ---------- -->
+    <div id="tab-recipients" class="hidden">
+      <div class="card overflow-hidden">
+        <div class="p-4 border-b border-red-100">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <h2 class="font-bold text-red-800 text-lg">นักเรียนผู้ได้รับทุน <span id="recCount" class="chip ml-1">0</span></h2>
+            <button id="btnAddRec" class="btn-primary">+ เพิ่มผู้รับทุน</button>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <select id="fDonor" class="field"><option value="">ผู้ให้ทุนทั้งหมด</option></select>
+            <select id="fGrade" class="field">
+              <option value="">ทุกชั้น</option>
+              <option value="1">ม.1</option><option value="2">ม.2</option><option value="3">ม.3</option>
+              <option value="4">ม.4</option><option value="5">ม.5</option><option value="6">ม.6</option>
+            </select>
+            <input id="fSearch" class="field" placeholder="ค้นหา รหัส / ชื่อ / ผู้ให้ทุน">
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="tbl">
+            <thead><tr>
+              <th class="text-center" style="width:56px">ที่</th><th>รหัสนักเรียน</th><th>ชื่อ - สกุล</th>
+              <th class="text-center">ชั้น</th><th class="text-center">เลขที่</th><th>ผู้ให้ทุน</th>
+              <th class="text-right">จำนวนเงิน</th><th class="text-right">จัดการ</th>
+            </tr></thead>
+            <tbody id="recBody"></tbody>
+            <tfoot><tr><td colspan="6" class="text-right">รวมตามที่กรอง</td><td id="recTotal" class="text-right">0</td><td></td></tr></tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------- แท็บ: รายงาน ---------- -->
+    <div id="tab-reports" class="hidden">
+      <div class="card p-5">
+        <h2 class="font-bold text-red-800 text-lg mb-3">ส่งออกรายงาน</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div>
+            <label class="lbl" for="rType">ประเภทรายงาน</label>
+            <select id="rType" class="field">
+              <option value="donor">รายชื่อผู้รับทุน ตามผู้ให้ทุน</option>
+              <option value="room">รายชื่อผู้รับทุน ตามห้องเรียน</option>
+              <option value="summary">สรุปยอดผู้ให้ทุน</option>
+            </select>
+          </div>
+          <div id="rDonorWrap">
+            <label class="lbl" for="rDonor">ผู้ให้ทุน</label>
+            <select id="rDonor" class="field"></select>
+          </div>
+          <div id="rRoomWrap" class="hidden">
+            <label class="lbl" for="rRoom">ห้องเรียน</label>
+            <select id="rRoom" class="field"></select>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-3 mt-4">
+          <button id="btnRptPdf" class="btn-primary shine">⬇ ดาวน์โหลด PDF</button>
+          <button id="btnRptWord" class="btn-ghost">⬇ ดาวน์โหลด Word</button>
+        </div>
+      </div>
+      <div class="card p-5 mt-5 overflow-x-auto">
+        <div class="text-sm text-gray-500 mb-3">ตัวอย่างรายงาน</div>
+        <div id="reportPreview" style="min-width:560px"></div>
+      </div>
+    </div>
+
+    <!-- ---------- แท็บ: ผู้ใช้งาน (เฉพาะแอดมิน) ---------- -->
+    <div id="tab-users" class="hidden">
+      <div class="card p-5 mb-5 text-sm text-gray-600">
+        <b class="text-red-800">เพิ่มผู้ใช้ใหม่:</b> สร้างบัญชีที่ Supabase Dashboard › Authentication › Users › Add user (ใส่อีเมล + รหัสผ่าน และติ๊ก Auto Confirm)
+        แล้วกลับมาตั้งสิทธิ์ในตารางนี้ — “ปิดการใช้งาน” = ผู้ใช้เข้าหลังบ้านไม่ได้
+      </div>
+      <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="tbl">
+            <thead><tr><th>อีเมล</th><th>ชื่อ - สกุล</th><th>สิทธิ์</th><th class="text-right">จัดการ</th></tr></thead>
+            <tbody id="userBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</section>
+
+<!-- ===================== Modal: ผู้ให้ทุน ===================== -->
+<div id="donorModal" class="modal">
+  <form id="donorForm" class="modal-box p-6">
+    <h3 id="donorTitle" class="text-xl font-bold text-red-800 mb-4">เพิ่มผู้ให้ทุน</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+      <div><label class="lbl" for="dFirst">ชื่อ</label><input id="dFirst" class="field" required></div>
+      <div><label class="lbl" for="dLast">นามสกุล</label><input id="dLast" class="field"></div>
+    </div>
+    <div class="mb-3">
+      <label class="lbl" for="dAmount">จำนวนเงินทุน (บาท)</label>
+      <input id="dAmount" type="number" min="0" step="0.01" class="field" required>
+      <p id="dHint" class="text-xs text-gray-500 mt-1"></p>
+    </div>
+    <div class="mb-5">
+      <label class="lbl" for="dNote">หมายเหตุ</label>
+      <textarea id="dNote" rows="3" class="field"></textarea>
+    </div>
+    <div class="flex justify-end gap-2">
+      <button type="button" class="btn-ghost" data-close="donorModal">ยกเลิก</button>
+      <button id="donorSave" type="submit" class="btn-primary">บันทึก</button>
+    </div>
+  </form>
+</div>
+
+<!-- ===================== Modal: ผู้รับทุน ===================== -->
+<div id="recModal" class="modal">
+  <form id="recForm" class="modal-box p-6">
+    <h3 id="recTitle" class="text-xl font-bold text-red-800 mb-4">เพิ่มผู้รับทุน</h3>
+    <div class="mb-3">
+      <label class="lbl" for="rDonorSel">ผู้ให้ทุน</label>
+      <select id="rDonorSel" class="field" required></select>
+      <p id="rHint" class="text-sm mt-1 font-semibold text-red-700"></p>
+    </div>
+    <div class="mb-3">
+      <label class="lbl" for="rCode">รหัสนักเรียน</label>
+      <input id="rCode" class="field" required autocomplete="off" inputmode="numeric">
+      <p id="rCodeHint" class="text-xs text-gray-500 mt-1"></p>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+      <div><label class="lbl" for="rFirst">ชื่อ</label><input id="rFirst" class="field" required></div>
+      <div><label class="lbl" for="rLast">นามสกุล</label><input id="rLast" class="field"></div>
+    </div>
+    <div class="grid grid-cols-3 gap-3 mb-3">
+      <div><label class="lbl" for="rGrade">ชั้น ม.</label>
+        <select id="rGrade" class="field" required>
+          <option value="">-</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option>
+        </select></div>
+      <div><label class="lbl" for="rRoomNo">ห้อง</label><input id="rRoomNo" type="number" min="1" class="field" required></div>
+      <div><label class="lbl" for="rNo">เลขที่</label><input id="rNo" type="number" min="1" class="field"></div>
+    </div>
+    <div class="mb-5">
+      <label class="lbl" for="rAmount">จำนวนเงินที่ได้รับ (บาท)</label>
+      <input id="rAmount" type="number" min="0.01" step="0.01" class="field" required>
+    </div>
+    <div class="flex justify-end gap-2">
+      <button type="button" class="btn-ghost" data-close="recModal">ยกเลิก</button>
+      <button id="recSave" type="submit" class="btn-primary">บันทึก</button>
+    </div>
+  </form>
+</div>
+
+<!-- ===================== Modal: ยืนยัน ===================== -->
+<div id="confirmModal" class="modal">
+  <div class="modal-box p-6 max-w-sm text-center">
+    <div class="text-4xl">⚠️</div>
+    <p id="confirmMsg" class="mt-2 text-gray-700"></p>
+    <div class="flex justify-center gap-2 mt-5">
+      <button id="confirmCancel" class="btn-ghost">ยกเลิก</button>
+      <button id="confirmOk" class="btn-primary">ลบ</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="config.js"></script>
+<script src="common.js"></script>
+<script>
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const { sb, configured, esc, money, classLabel, toast, countUp, cmpStudent, friendlyError } = App;
+
+  const state = { user: null, profile: null, donors: [], allocs: [], users: [] };
+  let editingDonor = null, editingAlloc = null, maxAmount = Infinity, saving = false;
+
+  const donorName = (d) => (((d && d.first_name) || '') + ' ' + ((d && d.last_name) || '')).trim();
+  const isAdmin = () => !!(state.profile && state.profile.role === 'admin');
+  const cmpAlloc = (a, b) => cmpStudent(a.student, b.student) || donorName(a.donor).localeCompare(donorName(b.donor), 'th');
+  const roleText = { admin: 'ผู้ดูแลระบบ', teacher: 'ครู', pending: 'ปิดการใช้งาน' };
+
+  /* ---------- เลือกหน้าจอ ---------- */
+  function show(view) {
+    $('loginView').classList.toggle('hidden', view !== 'login');
+    $('pendingView').classList.toggle('hidden', view !== 'pending');
+    $('appView').classList.toggle('hidden', view !== 'app');
+  }
+  function showTab(name) {
+    ['donors', 'recipients', 'reports', 'users'].forEach((t) => {
+      $('tab-' + t).classList.toggle('hidden', t !== name);
+      $('tabbtn-' + t).classList.toggle('tab-active', t === name);
+    });
+    if (name === 'reports') renderReportOptions();
+    if (name === 'users') loadUsers();
+  }
+
+  /* ---------- Modal / ยืนยัน ---------- */
+  function openModal(id) { $(id).classList.add('open'); }
+  function closeModal(id) { $(id).classList.remove('open'); }
+  document.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', () => closeModal(b.getAttribute('data-close'))));
+  document.querySelectorAll('.modal').forEach((m) => m.addEventListener('mousedown', (e) => {
+    if (e.target === m && m.id !== 'confirmModal') m.classList.remove('open');
+  }));
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    document.querySelectorAll('.modal.open').forEach((m) => { if (m.id === 'confirmModal') $('confirmCancel').click(); else m.classList.remove('open'); });
+  });
+  function confirmBox(msg, okText) {
+    return new Promise((resolve) => {
+      $('confirmMsg').textContent = msg;
+      $('confirmOk').textContent = okText || 'ลบ';
+      openModal('confirmModal');
+      const done = (v) => { closeModal('confirmModal'); $('confirmOk').onclick = null; $('confirmCancel').onclick = null; resolve(v); };
+      $('confirmOk').onclick = () => done(true);
+      $('confirmCancel').onclick = () => done(false);
+    });
+  }
+  function setBusy(btnId, on, label) {
+    saving = on;
+    const b = $(btnId);
+    b.disabled = on;
+    b.textContent = on ? 'กำลังบันทึก…' : label;
+  }
+
+  /* ---------- ดึงข้อมูลทั้งหมด (แบ่งหน้าเพื่อเกิน 1,000 แถว) ---------- */
+  async function fetchAll(build) {
+    const size = 1000;
+    let from = 0, out = [];
+    for (;;) {
+      const { data, error } = await build().range(from, from + size - 1);
+      if (error) throw error;
+      out = out.concat(data);
+      if (data.length < size) break;
+      from += size;
+    }
+    return out;
+  }
+  async function loadAll() {
+    try {
+      const [donors, allocs] = await Promise.all([
+        fetchAll(() => sb.from('donor_balances').select('*').order('created_at').order('id')),
+        fetchAll(() => sb.from('allocations')
+          .select('id,amount,donor_id,student_id,created_at,donor:donors(id,first_name,last_name),student:students(id,student_code,first_name,last_name,grade,room,class_no)')
+          .order('created_at').order('id'))
+      ]);
+      state.donors = donors.map((d) => Object.assign({}, d, { amount: Number(d.amount), allocated: Number(d.allocated), remaining: Number(d.remaining) }));
+      state.allocs = allocs.map((a) => Object.assign({}, a, { amount: Number(a.amount) })).filter((a) => a.donor && a.student);
+      renderDonors();
+      renderRecipientFilters();
+      renderRecipients();
+      if (!$('tab-reports').classList.contains('hidden')) renderReportOptions();
+    } catch (err) { toast(friendlyError(err), 'err'); }
+  }
+
+  /* =====================================================================
+     ผู้ให้ทุน
+     ===================================================================== */
+  function renderDonors() {
+    const ds = state.donors;
+    const tot = ds.reduce((a, d) => a + d.amount, 0);
+    const used = ds.reduce((a, d) => a + d.allocated, 0);
+    countUp($('stDonors'), ds.length, 500); countUp($('stTotal'), tot, 800); countUp($('stUsed'), used, 800); countUp($('stRemain'), tot - used, 800);
+    if (!ds.length) { $('donorBody').innerHTML = '<tr><td colspan="8" class="empty-box">ยังไม่มีผู้ให้ทุน — กด “เพิ่มผู้ให้ทุน”</td></tr>'; return; }
+    $('donorBody').innerHTML = ds.map((d, i) => {
+      const pct = d.amount > 0 ? Math.min(100, Math.round((d.allocated / d.amount) * 100)) : 0;
+      return '<tr class="row-in" style="animation-delay:' + Math.min(i, 20) * 25 + 'ms">' +
+        '<td class="text-center">' + (i + 1) + '</td>' +
+        '<td class="font-semibold">' + esc(donorName(d)) + '</td>' +
+        '<td class="text-right">' + money(d.amount) + '</td>' +
+        '<td class="text-right">' + money(d.allocated) + '</td>' +
+        '<td class="text-right font-semibold ' + (d.remaining > 0 ? 'text-green-700' : 'text-gray-500') + '">' + money(d.remaining) + '</td>' +
+        '<td><div class="progress"><i style="width:' + pct + '%"></i></div><div class="text-xs text-gray-500 mt-0.5">' + pct + '%</div></td>' +
+        '<td class="text-sm text-gray-600">' + esc(d.note) + '</td>' +
+        '<td class="text-right whitespace-nowrap">' +
+        '<button class="btn-ghost btn-sm" data-act="edit-donor" data-id="' + esc(d.id) + '">แก้ไข</button> ' +
+        '<button class="btn-danger btn-sm" data-act="del-donor" data-id="' + esc(d.id) + '">ลบ</button></td></tr>';
+    }).join('');
+  }
+
+  function openDonor(id) {
+    editingDonor = id ? state.donors.find((d) => d.id === id) : null;
+    $('donorTitle').textContent = editingDonor ? 'แก้ไขผู้ให้ทุน' : 'เพิ่มผู้ให้ทุน';
+    $('dFirst').value = editingDonor ? editingDonor.first_name : '';
+    $('dLast').value = editingDonor ? editingDonor.last_name : '';
+    $('dAmount').value = editingDonor ? editingDonor.amount : '';
+    $('dNote').value = editingDonor ? editingDonor.note : '';
+    $('dHint').textContent = editingDonor ? 'จัดสรรให้นักเรียนไปแล้ว ' + money(editingDonor.allocated) + ' บาท (ยอดทุนต้องไม่ต่ำกว่านี้)' : '';
+    openModal('donorModal');
+    setTimeout(() => $('dFirst').focus(), 50);
+  }
+
+  $('donorForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (saving) return;
+    const payload = {
+      first_name: $('dFirst').value.trim(),
+      last_name: $('dLast').value.trim(),
+      amount: parseFloat($('dAmount').value),
+      note: $('dNote').value.trim()
+    };
+    if (!payload.first_name) { toast('กรุณากรอกชื่อ', 'err'); return; }
+    if (!(payload.amount >= 0)) { toast('จำนวนเงินไม่ถูกต้อง', 'err'); return; }
+    setBusy('donorSave', true, 'บันทึก');
+    const res = editingDonor
+      ? await sb.from('donors').update(payload).eq('id', editingDonor.id)
+      : await sb.from('donors').insert(payload);
+    setBusy('donorSave', false, 'บันทึก');
+    if (res.error) { toast(friendlyError(res.error), 'err'); return; }
+    closeModal('donorModal');
+    toast('บันทึกผู้ให้ทุนเรียบร้อย');
+    loadAll();
+  });
+
+  $('donorBody').addEventListener('click', async (e) => {
+    const btn = e.target.closest('button[data-act]');
+    if (!btn) return;
+    const id = btn.getAttribute('data-id');
+    if (btn.getAttribute('data-act') === 'edit-donor') return openDonor(id);
+    const d = state.donors.find((x) => x.id === id);
+    if (!d) return;
+    const n = state.allocs.filter((a) => a.donor_id === id).length;
+    const ok = await confirmBox('ลบผู้ให้ทุน “' + donorName(d) + '”' + (n ? ' และรายชื่อผู้รับทุนของท่านนี้ ' + n + ' รายการ' : '') + ' ?');
+    if (!ok) return;
+    const { error } = await sb.from('donors').delete().eq('id', id);
+    if (error) return toast(friendlyError(error), 'err');
+    toast('ลบผู้ให้ทุนเรียบร้อย');
+    loadAll();
+  });
+  $('btnAddDonor').addEventListener('click', () => openDonor(null));
+
+  /* =====================================================================
+     ผู้รับทุน
+     ===================================================================== */
+  function renderRecipientFilters() {
+    const fd = $('fDonor'), cur = fd.value;
+    fd.innerHTML = '<option value="">ผู้ให้ทุนทั้งหมด</option>' +
+      state.donors.map((d) => '<option value="' + esc(d.id) + '">' + esc(donorName(d)) + '</option>').join('');
+    fd.value = state.donors.some((d) => d.id === cur) ? cur : '';
+  }
+  function filteredAllocs() {
+    const fd = $('fDonor').value, fg = $('fGrade').value, q = $('fSearch').value.trim().toLowerCase();
+    return state.allocs.filter((a) => {
+      if (fd && a.donor_id !== fd) return false;
+      if (fg && String(a.student.grade) !== fg) return false;
+      if (q) {
+        const s = (a.student.student_code + ' ' + a.student.first_name + ' ' + a.student.last_name + ' ' + donorName(a.donor)).toLowerCase();
+        if (s.indexOf(q) === -1) return false;
+      }
+      return true;
+    }).sort(cmpAlloc);
+  }
+  function renderRecipients() {
+    const list = filteredAllocs();
+    $('recCount').textContent = list.length;
+    $('recTotal').textContent = money(list.reduce((a, r) => a + r.amount, 0));
+    if (!list.length) { $('recBody').innerHTML = '<tr><td colspan="8" class="empty-box">ไม่พบรายการ</td></tr>'; return; }
+    $('recBody').innerHTML = list.map((a, i) => {
+      const s = a.student;
+      return '<tr class="row-in" style="animation-delay:' + Math.min(i, 20) * 20 + 'ms">' +
+        '<td class="text-center">' + (i + 1) + '</td>' +
+        '<td class="font-mono">' + esc(s.student_code) + '</td>' +
+        '<td>' + esc((s.first_name + ' ' + s.last_name).trim()) + '</td>' +
+        '<td class="text-center"><span class="chip">' + esc(classLabel(s.grade, s.room)) + '</span></td>' +
+        '<td class="text-center">' + esc(s.class_no == null ? '-' : s.class_no) + '</td>' +
+        '<td>' + esc(donorName(a.donor)) + '</td>' +
+        '<td class="text-right font-semibold">' + money(a.amount) + '</td>' +
+        '<td class="text-right whitespace-nowrap">' +
+        '<button class="btn-ghost btn-sm" data-act="edit-rec" data-id="' + esc(a.id) + '">แก้ไข</button> ' +
+        '<button class="btn-danger btn-sm" data-act="del-rec" data-id="' + esc(a.id) + '">ลบ</button></td></tr>';
+    }).join('');
+  }
+  ['fDonor', 'fGrade'].forEach((id) => $(id).addEventListener('change', renderRecipients));
+  $('fSearch').addEventListener('input', renderRecipients);
+
+  function updateHint() {
+    const d = state.donors.find((x) => x.id === $('rDonorSel').value);
+    if (!d) { $('rHint').textContent = ''; maxAmount = Infinity; return; }
+    let rem = d.remaining;
+    if (editingAlloc && editingAlloc.donor_id === d.id) rem += editingAlloc.amount;
+    rem = Math.round(rem * 100) / 100;
+    maxAmount = rem;
+    $('rHint').textContent = 'ยอดคงเหลือที่จัดสรรได้: ' + money(rem) + ' บาท';
+    $('rAmount').max = String(rem);
+  }
+  $('rDonorSel').addEventListener('change', updateHint);
+
+  // กรอกรหัสที่เคยมีในระบบ -> เติมชื่อ/ชั้นให้อัตโนมัติ (เฉพาะตอนเพิ่มใหม่ และช่องยังว่าง)
+  $('rCode').addEventListener('blur', () => {
+    const code = $('rCode').value.trim();
+    $('rCodeHint').textContent = '';
+    if (!code) return;
+    const hit = state.allocs.find((a) => a.student.student_code === code);
+    if (!hit) return;
+    const s = hit.student;
+    $('rCodeHint').textContent = 'พบนักเรียนในระบบแล้ว: ' + s.first_name + ' ' + s.last_name + ' (' + classLabel(s.grade, s.room) + ') — การบันทึกจะอัปเดตข้อมูลนักเรียนคนนี้';
+    if (!editingAlloc && !$('rFirst').value && !$('rGrade').value) {
+      $('rFirst').value = s.first_name; $('rLast').value = s.last_name;
+      $('rGrade').value = s.grade; $('rRoomNo').value = s.room; $('rNo').value = s.class_no == null ? '' : s.class_no;
+    }
+  });
+
+  function openRec(id) {
+    editingAlloc = id ? state.allocs.find((a) => a.id === id) : null;
+    if (!editingAlloc && !state.donors.length) { toast('กรุณาเพิ่มผู้ให้ทุนก่อน', 'err'); return; }
+    $('recTitle').textContent = editingAlloc ? 'แก้ไขผู้รับทุน' : 'เพิ่มผู้รับทุน';
+    $('rDonorSel').innerHTML = state.donors.map((d) =>
+      '<option value="' + esc(d.id) + '">' + esc(donorName(d)) + ' (คงเหลือ ' + money(d.remaining) + ' บาท)</option>').join('');
+    const s = editingAlloc ? editingAlloc.student : null;
+    $('rDonorSel').value = editingAlloc ? editingAlloc.donor_id : ($('fDonor').value || state.donors[0].id);
+    $('rCode').value = s ? s.student_code : '';
+    $('rFirst').value = s ? s.first_name : '';
+    $('rLast').value = s ? s.last_name : '';
+    $('rGrade').value = s ? s.grade : '';
+    $('rRoomNo').value = s ? s.room : '';
+    $('rNo').value = s && s.class_no != null ? s.class_no : '';
+    $('rAmount').value = editingAlloc ? editingAlloc.amount : '';
+    $('rCodeHint').textContent = '';
+    updateHint();
+    openModal('recModal');
+    setTimeout(() => (editingAlloc ? $('rAmount') : $('rCode')).focus(), 50);
+  }
+
+  $('recForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (saving) return;
+    const amount = parseFloat($('rAmount').value);
+    if (!(amount > 0)) { toast('จำนวนเงินต้องมากกว่า 0', 'err'); return; }
+    if (amount > maxAmount + 0.001) { toast('จำนวนเงินเกินยอดคงเหลือของผู้ให้ทุน (' + money(maxAmount) + ' บาท)', 'err'); return; }
+    const grade = parseInt($('rGrade').value, 10), room = parseInt($('rRoomNo').value, 10), no = parseInt($('rNo').value, 10);
+    if (!(grade >= 1 && grade <= 6) || !(room >= 1)) { toast('กรุณาระบุชั้น (ม.1-6) และห้องให้ถูกต้อง', 'err'); return; }
+    setBusy('recSave', true, 'บันทึก');
+    const { error } = await sb.rpc('save_recipient', {
+      p_allocation_id: editingAlloc ? editingAlloc.id : null,
+      p_donor_id: $('rDonorSel').value,
+      p_student_code: $('rCode').value.trim(),
+      p_first_name: $('rFirst').value.trim(),
+      p_last_name: $('rLast').value.trim(),
+      p_grade: grade,
+      p_room: room,
+      p_class_no: Number.isFinite(no) ? no : null,
+      p_amount: amount
+    });
+    setBusy('recSave', false, 'บันทึก');
+    if (error) { toast(friendlyError(error), 'err'); return; }
+    closeModal('recModal');
+    toast('บันทึกผู้รับทุนเรียบร้อย');
+    loadAll();
+  });
+
+  $('recBody').addEventListener('click', async (e) => {
+    const btn = e.target.closest('button[data-act]');
+    if (!btn) return;
+    const id = btn.getAttribute('data-id');
+    if (btn.getAttribute('data-act') === 'edit-rec') return openRec(id);
+    const a = state.allocs.find((x) => x.id === id);
+    if (!a) return;
+    const ok = await confirmBox('ลบทุน ' + money(a.amount) + ' บาท ของ ' + a.student.first_name + ' ' + a.student.last_name + ' ? (ยอดจะกลับไปเป็นยอดคงเหลือของผู้ให้ทุน)');
+    if (!ok) return;
+    const { error } = await sb.from('allocations').delete().eq('id', id);
+    if (error) return toast(friendlyError(error), 'err');
+    toast('ลบรายการเรียบร้อย');
+    loadAll();
+  });
+  $('btnAddRec').addEventListener('click', () => openRec(null));
+
+  /* =====================================================================
+     รายงาน
+     ===================================================================== */
+  function allRooms() {
+    const m = new Map();
+    state.allocs.forEach((a) => m.set(a.student.grade + '-' + a.student.room, { grade: a.student.grade, room: a.student.room }));
+    return Array.from(m.values()).sort((x, y) => x.grade - y.grade || x.room - y.room);
+  }
+  function renderReportOptions() {
+    const cd = $('rDonor').value, cr = $('rRoom').value;
+    $('rDonor').innerHTML = '<option value="">ผู้ให้ทุนทุกคน</option>' +
+      state.donors.map((d) => '<option value="' + esc(d.id) + '">' + esc(donorName(d)) + '</option>').join('');
+    $('rRoom').innerHTML = '<option value="">ทุกห้อง</option>' +
+      allRooms().map((r) => '<option value="' + r.grade + '-' + r.room + '">' + esc(classLabel(r.grade, r.room)) + '</option>').join('');
+    if (state.donors.some((d) => d.id === cd)) $('rDonor').value = cd;
+    if (Array.from($('rRoom').options).some((o) => o.value === cr)) $('rRoom').value = cr;
+    toggleReportSel();
+    previewReport();
+  }
+  function toggleReportSel() {
+    const t = $('rType').value;
+    $('rDonorWrap').classList.toggle('hidden', t !== 'donor');
+    $('rRoomWrap').classList.toggle('hidden', t !== 'room');
+  }
+  const sum = (arr) => arr.reduce((a, r) => a + r.amount, 0);
+
+  function buildReport() {
+    const type = $('rType').value;
+    const nameOf = (s) => (s.first_name + ' ' + s.last_name).trim();
+    if (type === 'summary') {
+      const ds = state.donors;
+      if (!ds.length) return null;
+      return {
+        file: 'สรุปยอดผู้ให้ทุน',
+        html: App.buildReportHTML({
+          title: 'สรุปยอดผู้ให้ทุนการศึกษา', subtitle: '',
+          columns: [
+            { label: 'ที่', align: 'center', width: '6%', get: (r, i) => String(i + 1) },
+            { label: 'ผู้ให้ทุน', get: (r) => donorName(r) },
+            { label: 'ยอดทุน (บาท)', align: 'right', get: (r) => money(r.amount) },
+            { label: 'จัดสรรแล้ว (บาท)', align: 'right', get: (r) => money(r.allocated) },
+            { label: 'คงเหลือ (บาท)', align: 'right', get: (r) => money(r.remaining) },
+            { label: 'หมายเหตุ', get: (r) => r.note || '' }
+          ],
+          rows: ds,
+          total: { label: 'รวมทั้งสิ้น', labelSpan: 2, values: [money(sum(ds)), money(ds.reduce((a, d) => a + d.allocated, 0)), money(ds.reduce((a, d) => a + d.remaining, 0))] }
+        })
+      };
+    }
+    if (type === 'donor') {
+      const did = $('rDonor').value;
+      const rows = state.allocs.filter((a) => !did || a.donor_id === did)
+        .sort((a, b) => donorName(a.donor).localeCompare(donorName(b.donor), 'th') || cmpStudent(a.student, b.student));
+      if (!rows.length) return null;
+      const d = did ? state.donors.find((x) => x.id === did) : null;
+      const columns = did
+        ? [
+            { label: 'ที่', align: 'center', width: '7%', get: (r, i) => String(i + 1) },
+            { label: 'รหัสนักเรียน', get: (r) => r.student.student_code },
+            { label: 'ชื่อ', get: (r) => r.student.first_name },
+            { label: 'สกุล', get: (r) => r.student.last_name },
+            { label: 'ชั้น', align: 'center', get: (r) => classLabel(r.student.grade, r.student.room) },
+            { label: 'จำนวนเงิน (บาท)', align: 'right', get: (r) => money(r.amount) }
+          ]
+        : [
+            { label: 'ที่', align: 'center', width: '6%', get: (r, i) => String(i + 1) },
+            { label: 'ผู้ให้ทุน', get: (r) => donorName(r.donor) },
+            { label: 'รหัสนักเรียน', get: (r) => r.student.student_code },
+            { label: 'ชื่อ - สกุล', get: (r) => nameOf(r.student) },
+            { label: 'ชั้น', align: 'center', get: (r) => classLabel(r.student.grade, r.student.room) },
+            { label: 'จำนวนเงิน (บาท)', align: 'right', get: (r) => money(r.amount) }
+          ];
+      return {
+        file: d ? 'ผู้รับทุน_' + donorName(d) : 'ผู้รับทุน_ทุกผู้ให้ทุน',
+        html: App.buildReportHTML({
+          title: 'รายชื่อนักเรียนผู้ได้รับทุนการศึกษา',
+          subtitle: d ? 'ผู้ให้ทุน: ' + donorName(d) : 'ผู้ให้ทุนทุกคน',
+          columns: columns, rows: rows,
+          total: { label: 'รวมทั้งสิ้น ' + rows.length + ' รายการ', labelSpan: 5, values: [money(sum(rows))] }
+        })
+      };
+    }
+    // ตามห้องเรียน
+    const rv = $('rRoom').value;
+    let rows = state.allocs.slice();
+    if (rv) { const p = rv.split('-').map(Number); rows = rows.filter((a) => a.student.grade === p[0] && a.student.room === p[1]); }
+    if (!rows.length) return null;
+    const columns = rv
+      ? [
+          { label: 'ที่', align: 'center', width: '6%', get: (r, i) => String(i + 1) },
+          { label: 'เลขที่', align: 'center', width: '8%', get: (r) => (r.student.class_no == null ? '-' : String(r.student.class_no)) },
+          { label: 'รหัสนักเรียน', get: (r) => r.student.student_code },
+          { label: 'ชื่อ - สกุล', get: (r) => nameOf(r.student) },
+          { label: 'ผู้ให้ทุน', get: (r) => donorName(r.donor) },
+          { label: 'จำนวนเงิน (บาท)', align: 'right', get: (r) => money(r.amount) }
+        ]
+      : [
+          { label: 'ที่', align: 'center', width: '6%', get: (r, i) => String(i + 1) },
+          { label: 'ชั้น', align: 'center', get: (r) => classLabel(r.student.grade, r.student.room) },
+          { label: 'เลขที่', align: 'center', get: (r) => (r.student.class_no == null ? '-' : String(r.student.class_no)) },
+          { label: 'รหัสนักเรียน', get: (r) => r.student.student_code },
+          { label: 'ชื่อ - สกุล', get: (r) => nameOf(r.student) },
+          { label: 'ผู้ให้ทุน', get: (r) => donorName(r.donor) },
+          { label: 'จำนวนเงิน (บาท)', align: 'right', get: (r) => money(r.amount) }
+        ];
+    rows = rv
+      ? rows.sort((a, b) => String(a.student.student_code).localeCompare(String(b.student.student_code)) || donorName(a.donor).localeCompare(donorName(b.donor), 'th'))
+      : rows.sort(cmpAlloc);
+    return {
+      file: rv ? 'ผู้รับทุน_ห้อง_' + rv : 'ผู้รับทุน_ทุกห้อง',
+      html: App.buildReportHTML({
+        title: 'รายชื่อนักเรียนผู้ได้รับทุนการศึกษา',
+        subtitle: rv ? 'ห้อง ' + classLabel.apply(null, rv.split('-').map(Number)) : 'ทุกห้องเรียน',
+        columns: columns, rows: rows,
+        total: { label: 'รวมทั้งสิ้น ' + rows.length + ' รายการ', labelSpan: columns.length - 1, values: [money(sum(rows))] }
+      })
+    };
+  }
+  function previewReport() {
+    const r = buildReport();
+    $('reportPreview').innerHTML = r ? r.html : '<div class="empty-box">ไม่มีข้อมูลสำหรับรายงานนี้</div>';
+  }
+  ['rType', 'rDonor', 'rRoom'].forEach((id) => $(id).addEventListener('change', () => { toggleReportSel(); previewReport(); }));
+  $('btnRptPdf').addEventListener('click', () => { const r = buildReport(); if (!r) return toast('ไม่มีข้อมูลสำหรับส่งออก', 'err'); App.exportPDF(r.html, r.file); });
+  $('btnRptWord').addEventListener('click', () => { const r = buildReport(); if (!r) return toast('ไม่มีข้อมูลสำหรับส่งออก', 'err'); App.exportWord(r.html, r.file); });
+
+  /* =====================================================================
+     ผู้ใช้งาน (เฉพาะแอดมิน)
+     ===================================================================== */
+  async function loadUsers() {
+    if (!isAdmin()) return;
+    const { data, error } = await sb.from('profiles').select('*').order('created_at');
+    if (error) return toast(friendlyError(error), 'err');
+    state.users = data;
+    $('userBody').innerHTML = data.map((u) => {
+      const me = u.id === state.user.id;
+      return '<tr>' +
+        '<td>' + esc(u.email) + (me ? ' <span class="chip">คุณ</span>' : '') + '</td>' +
+        '<td><input class="field" style="padding:.4rem .6rem" data-uname="' + esc(u.id) + '" value="' + esc(u.full_name) + '" placeholder="ชื่อ - สกุล"></td>' +
+        '<td><select class="field" style="padding:.4rem .6rem" data-urole="' + esc(u.id) + '"' + (me ? ' disabled' : '') + '>' +
+        ['admin', 'teacher', 'pending'].map((r) => '<option value="' + r + '"' + (u.role === r ? ' selected' : '') + '>' + roleText[r] + '</option>').join('') +
+        '</select></td>' +
+        '<td class="text-right"><button class="btn-primary btn-sm" data-act="save-user" data-id="' + esc(u.id) + '">บันทึก</button></td></tr>';
+    }).join('') || '<tr><td colspan="4" class="empty-box">ไม่มีผู้ใช้</td></tr>';
+  }
+  $('userBody').addEventListener('click', async (e) => {
+    const btn = e.target.closest('button[data-act="save-user"]');
+    if (!btn) return;
+    const id = btn.getAttribute('data-id');
+    const name = document.querySelector('[data-uname="' + id + '"]').value.trim();
+    const role = document.querySelector('[data-urole="' + id + '"]').value;
+    const patch = { full_name: name };
+    if (id !== state.user.id) patch.role = role;
+    const { error } = await sb.from('profiles').update(patch).eq('id', id);
+    if (error) return toast(friendlyError(error), 'err');
+    toast('บันทึกผู้ใช้เรียบร้อย');
+  });
+
+  /* =====================================================================
+     เข้า/ออกระบบ
+     ===================================================================== */
+  async function enter(user) {
+    state.user = user;
+    const { data: profile, error } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
+    if (error) toast(friendlyError(error), 'err');
+    state.profile = profile;
+    if (!profile || (profile.role !== 'admin' && profile.role !== 'teacher')) { show('pending'); return; }
+    $('who').textContent = profile.full_name || user.email;
+    $('roleBadge').textContent = roleText[profile.role];
+    $('tabbtn-users').classList.toggle('hidden', !isAdmin());
+    show('app');
+    showTab('donors');
+    await loadAll();
+  }
+  async function logout() { await sb.auth.signOut(); }
+
+  $('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = $('loginBtn');
+    $('loginErr').classList.add('hidden');
+    btn.disabled = true; btn.textContent = 'กำลังเข้าสู่ระบบ…';
+    const { data, error } = await sb.auth.signInWithPassword({ email: $('email').value.trim(), password: $('password').value });
+    btn.disabled = false; btn.textContent = 'เข้าสู่ระบบ';
+    if (error) { $('loginErr').textContent = 'อีเมลหรือรหัสผ่านไม่ถูกต้อง'; $('loginErr').classList.remove('hidden'); return; }
+    $('password').value = '';
+    await enter(data.user);
+  });
+  $('btnLogout').addEventListener('click', logout);
+  $('pendingOut').addEventListener('click', logout);
+  document.querySelectorAll('.tab-btn').forEach((b) => b.addEventListener('click', () => showTab(b.getAttribute('data-tab'))));
+
+  async function init() {
+    if (!configured || !sb) {
+      show('login');
+      $('loginErr').textContent = 'ยังไม่ได้ตั้งค่า Supabase — กรุณาแก้ไฟล์ config.js';
+      $('loginErr').classList.remove('hidden');
+      $('loginBtn').disabled = true;
+      return;
+    }
+    sb.auth.onAuthStateChange((ev) => {
+      if (ev === 'SIGNED_OUT') { state.user = null; state.profile = null; show('login'); }
+    });
+    const { data } = await sb.auth.getSession();
+    if (data && data.session) await enter(data.session.user); else show('login');
+  }
+  init();
+})();
+</script>
+</body>
+</html>

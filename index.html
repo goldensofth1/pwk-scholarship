@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ทุนการศึกษา โรงเรียนพังโคนวิทยาคม</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Sarabun', 'sans-serif'] } } } };</script>
+<style>
+body { font-family: 'Sarabun', system-ui, sans-serif; background: #fff7f7; color: #1f2937; min-height: 100vh; }
+
+.hero-bg { background: linear-gradient(120deg, #7f1d1d, #b91c1c, #dc2626, #991b1b); background-size: 300% 300%; animation: gradShift 14s ease infinite; }
+@keyframes gradShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+.blob { position: absolute; border-radius: 9999px; filter: blur(42px); opacity: .32; animation: floaty 10s ease-in-out infinite; pointer-events: none; }
+@keyframes floaty { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(24px,-30px) scale(1.12); } }
+.bubble { position: absolute; bottom: -20px; width: 14px; height: 14px; border-radius: 9999px; background: rgba(255,255,255,.35); animation: rise 9s linear infinite; pointer-events: none; }
+@keyframes rise { 0% { transform: translateY(0) scale(.6); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(-360px) scale(1.3); opacity: 0; } }
+.bob { display: inline-block; animation: bob 3s ease-in-out infinite; }
+@keyframes bob { 0%,100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-8px) rotate(4deg); } }
+
+.fade-up { opacity: 0; transform: translateY(14px); animation: fadeUp .6s ease forwards; }
+@keyframes fadeUp { to { opacity: 1; transform: none; } }
+.row-in { opacity: 0; animation: rowIn .45s ease forwards; }
+@keyframes rowIn { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: none; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.card { background: #fff; border-radius: 1.25rem; border: 1px solid #fee2e2; box-shadow: 0 10px 30px -12px rgba(127,29,29,.25); }
+.field { width: 100%; border: 1.5px solid #fecaca; border-radius: .85rem; padding: .65rem .9rem; background: #fff; outline: none; transition: .2s; font-size: 1rem; }
+.field:focus { border-color: #dc2626; box-shadow: 0 0 0 4px rgba(220,38,38,.15); }
+.lbl { display: block; font-size: .85rem; font-weight: 600; color: #991b1b; margin-bottom: .25rem; }
+.btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; font-weight: 600; padding: .65rem 1.25rem; border-radius: .85rem; transition: .2s; white-space: nowrap; cursor: pointer; background: linear-gradient(135deg, #dc2626, #991b1b); color: #fff; box-shadow: 0 6px 16px -6px rgba(185,28,28,.6); }
+.btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 20px -6px rgba(185,28,28,.7); }
+.btn-primary:disabled { opacity: .45; cursor: not-allowed; }
+.shine { position: relative; overflow: hidden; }
+.shine::after { content: ''; position: absolute; top: 0; left: -120%; width: 55%; height: 100%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.45), transparent); transform: skewX(-20deg); animation: shine 3.6s infinite; }
+@keyframes shine { to { left: 160%; } }
+
+:where(.tbl thead th) { text-align: left; }
+.tbl { width: 100%; border-collapse: collapse; font-size: .95rem; }
+.tbl thead th { background: #b91c1c; color: #fff; padding: .7rem .75rem; font-weight: 600; white-space: nowrap; }
+.tbl td { padding: .6rem .75rem; border-bottom: 1px solid #fee2e2; vertical-align: middle; }
+.tbl tbody tr:hover { background: #fef2f2; }
+.tbl tfoot td { background: #fee2e2; font-weight: 700; color: #7f1d1d; padding: .7rem .75rem; }
+.group-row td { background: #fee2e2; color: #7f1d1d; font-weight: 700; }
+.group-row td span { font-weight: 500; font-size: .85rem; opacity: .8; }
+.chip { display: inline-block; padding: .1rem .6rem; border-radius: 999px; background: #fee2e2; color: #991b1b; font-weight: 600; font-size: .85rem; }
+.stat { background: linear-gradient(135deg, #fff, #fef2f2); border: 1px solid #fecaca; border-radius: 1rem; padding: .9rem 1rem; }
+.stat b { display: block; font-size: 1.5rem; color: #b91c1c; line-height: 1.2; }
+.stat span { font-size: .8rem; color: #6b7280; }
+.navbtn { padding: .375rem .75rem; border-radius: 999px; transition: .2s; cursor: pointer; }
+.navbtn:hover { background: rgba(255,255,255,.2); }
+.navbtn.on { background: rgba(255,255,255,.25); font-weight: 600; }
+.spinner { width: 2rem; height: 2rem; border: 3px solid #fecaca; border-top-color: #dc2626; border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto; }
+.empty-box { padding: 2.5rem 1rem; text-align: center; color: #9ca3af; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="hero-bg relative overflow-hidden text-white">
+  <div class="blob w-72 h-72 bg-white -top-20 -left-16"></div>
+  <div class="blob w-96 h-96 bg-red-300 top-10 -right-20" style="animation-delay:-4s"></div>
+  <span class="bubble" style="left:8%;animation-delay:0s"></span>
+  <span class="bubble" style="left:26%;animation-delay:2.5s;width:10px;height:10px"></span>
+  <span class="bubble" style="left:47%;animation-delay:5s;width:18px;height:18px"></span>
+  <span class="bubble" style="left:68%;animation-delay:1.5s"></span>
+  <span class="bubble" style="left:86%;animation-delay:4s;width:12px;height:12px"></span>
+
+  <nav class="relative z-10 max-w-6xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <span class="text-3xl bob">🎓</span>
+      <div>
+        <div class="font-bold leading-tight">โรงเรียนพังโคนวิทยาคม</div>
+        <div class="text-xs text-red-100">Phangkhon Wittayakhom School</div>
+      </div>
+    </div>
+    <div class="flex gap-1 text-sm">
+      <button id="navDonor" class="navbtn on">ผู้รับทุน</button>
+      <button id="navTeacher" class="navbtn">ครูที่ปรึกษา</button>
+      <a href="admin.html" class="navbtn">เข้าสู่ระบบ</a>
+    </div>
+  </nav>
+
+  <div class="relative z-10 max-w-6xl mx-auto px-4 pt-8 pb-28 text-center">
+    <h1 id="heroTitle" class="fade-up text-3xl md:text-5xl font-bold drop-shadow">ระบบทุนการศึกษา</h1>
+    <p id="heroSub" class="fade-up text-red-100 mt-3 md:text-lg" style="animation-delay:.15s">รายชื่อนักเรียนผู้ได้รับทุน แยกตามผู้ให้ทุน</p>
+  </div>
+
+  <svg class="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 80" preserveAspectRatio="none" style="height:60px" aria-hidden="true">
+    <path fill="#fff7f7" d="M0,40 C240,90 480,0 720,30 C960,60 1200,10 1440,40 L1440,80 L0,80 Z"></path>
+  </svg>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 -mt-12 relative z-20 pb-16">
+<div id="view-donor">
+
+  <section class="card fade-up p-5 md:p-6" style="animation-delay:.2s">
+    <label for="donor" class="lbl">เลือกผู้ให้ทุน</label>
+    <div class="flex flex-col md:flex-row gap-3">
+      <select id="donor" class="field flex-1"><option value="">กำลังโหลด…</option></select>
+      <button id="btnPdf" class="btn-primary shine" disabled>⬇ ดาวน์โหลด PDF</button>
+    </div>
+
+    <div id="statsWrap" class="hidden">
+      <div class="grid grid-cols-2 gap-3 mt-5">
+        <div class="stat"><b id="stCount">0</b><span>จำนวนผู้รับทุน (คน)</span></div>
+        <div class="stat"><b id="stTotal">0</b><span>รวมเงินทุนที่มอบ (บาท)</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card mt-6 overflow-hidden fade-up" style="animation-delay:.3s">
+    <div id="stateBox" class="empty-box">เลือกผู้ให้ทุนเพื่อดูรายชื่อนักเรียน</div>
+    <div id="tableWrap" class="hidden overflow-x-auto">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th class="text-center" style="width:64px">ที่</th>
+            <th>รหัสนักเรียน</th>
+            <th>ชื่อ</th>
+            <th>สกุล</th>
+            <th class="text-center">ชั้น</th>
+            <th class="text-right">จำนวนเงิน (บาท)</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+        <tfoot>
+          <tr><td colspan="5" class="text-right">รวมทั้งสิ้น</td><td id="tfTotal" class="text-right">0</td></tr>
+        </tfoot>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+<!-- ============ มุมมอง: ครูที่ปรึกษา (ไม่ต้องล็อกอิน) ============ -->
+<div id="view-teacher" class="hidden">
+  <section class="card fade-up p-5 md:p-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div class="md:col-span-2">
+        <label for="room" class="lbl">เลือกห้องที่ปรึกษา</label>
+        <select id="room" class="field"><option value="">กำลังโหลด…</option></select>
+      </div>
+      <div>
+        <label for="sortBy" class="lbl">เรียงลำดับ</label>
+        <select id="sortBy" class="field">
+          <option value="code">ตามรหัสนักเรียน</option>
+          <option value="no">ตามเลขที่</option>
+        </select>
+      </div>
+    </div>
+    <div class="mt-3">
+      <button id="btnPdfT" class="btn-primary shine" disabled>⬇ ดาวน์โหลด PDF</button>
+    </div>
+
+    <div id="statsWrapT" class="hidden">
+      <div class="grid grid-cols-2 gap-3 mt-5">
+        <div class="stat"><b id="stCountT">0</b><span>นักเรียนที่ได้รับทุน (คน)</span></div>
+        <div class="stat"><b id="stTotalT">0</b><span>รวมเงินทุนของห้อง (บาท)</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card mt-6 overflow-hidden">
+    <div id="stateBoxT" class="empty-box">เลือกห้องเพื่อดูรายชื่อนักเรียน</div>
+    <div id="tableWrapT" class="hidden overflow-x-auto">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th class="text-center" style="width:64px">ที่</th>
+            <th class="text-center">เลขที่</th>
+            <th>รหัสนักเรียน</th>
+            <th>ชื่อ - สกุล</th>
+            <th>ผู้ให้ทุน</th>
+            <th class="text-right">จำนวนเงิน (บาท)</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyT"></tbody>
+        <tfoot>
+          <tr><td colspan="5" class="text-right">รวมทั้งสิ้น</td><td id="tfTotalT" class="text-right">0</td></tr>
+        </tfoot>
+      </table>
+    </div>
+  </section>
+</div>
+
+  <p class="text-center text-xs text-gray-400 mt-8">© โรงเรียนพังโคนวิทยาคม · ระบบทุนการศึกษา</p>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* ============================================================
+     ตั้งค่า — แก้เฉพาะ 2 บรรทัดนี้ (Supabase > Project Settings > API)
+     ใช้ anon public key เท่านั้น ห้ามใส่ service_role key
+     ============================================================ */
+  const SUPABASE_URL = 'https://raancgrkkpgmvznjtdoq.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhYW5jZ3Jra3BnbXZ6bmp0ZG9xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQyODc2OTAsImV4cCI6MjEwOTg2MzY5MH0.NyFHOwzRFY-3wMCxxov8kj06VSUCrvL2QQpzg0yXGb0';
+  const SCHOOL_NAME = 'โรงเรียนพังโคนวิทยาคม';
+
+  const $ = (id) => document.getElementById(id);
+  const configured = SUPABASE_URL.indexOf('YOUR-') === -1 && SUPABASE_ANON_KEY.indexOf('YOUR-') === -1;
+  const sb = configured && window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+  /* ---------- ตัวช่วย ---------- */
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const money = (n) => Number(n || 0).toLocaleString('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  const classLabel = (g, r) => 'ม.' + g + '/' + r;
+  const todayTH = () => new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+  const safeFile = (n) => String(n || 'report').replace(/[\\/:*?"<>|]+/g, '_').replace(/\s+/g, '_');
+  const friendlyError = (e) => {
+    const m = (e && e.message) || String(e);
+    if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ กรุณาตรวจสอบอินเทอร์เน็ต';
+    return m;
+  };
+
+  function toast(msg, type) {
+    let box = $('toasts');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'toasts';
+      box.style.cssText = 'position:fixed;top:1rem;right:1rem;z-index:100;display:flex;flex-direction:column;gap:.5rem;max-width:calc(100vw - 2rem)';
+      document.body.appendChild(box);
+    }
+    const t = document.createElement('div');
+    t.className = 'fade-up';
+    t.style.cssText = 'padding:.75rem 1rem;border-radius:.85rem;color:#fff;font-size:.95rem;box-shadow:0 10px 25px -8px rgba(0,0,0,.35);background:' + (type === 'err' ? '#b91c1c' : '#15803d');
+    t.textContent = msg;
+    box.appendChild(t);
+    setTimeout(() => { t.style.transition = 'opacity .4s'; t.style.opacity = '0'; }, 3600);
+    setTimeout(() => t.remove(), 4100);
+  }
+
+  function countUp(el, to, ms) {
+    to = Number(to) || 0; ms = ms || 900;
+    let start = null;
+    const step = (ts) => {
+      if (start === null) start = ts;
+      const p = Math.min(1, (ts - start) / ms);
+      el.textContent = money(to * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(step); else el.textContent = money(to);
+    };
+    requestAnimationFrame(step);
+  }
+
+  /* ---------- รายงาน PDF ---------- */
+  function buildReportHTML(o) {
+    const cols = o.columns;
+    const th = cols.map((c) => '<th bgcolor="#b91c1c" style="border:1px solid #7f1d1d;background:#b91c1c;color:#ffffff;padding:6px 8px;text-align:' + (c.align || 'left') + ';' + (c.width ? 'width:' + c.width + ';' : '') + '">' + esc(c.label) + '</th>').join('');
+    const body = o.rows.map((r, i) => '<tr style="page-break-inside:avoid">' + cols.map((c) =>
+      '<td style="border:1px solid #9ca3af;padding:5px 8px;text-align:' + (c.align || 'left') + ';' + (i % 2 ? 'background:#fef2f2;' : '') + '">' + esc(c.get(r, i)) + '</td>').join('') + '</tr>').join('');
+    const t = o.total;
+    const foot = '<tr style="page-break-inside:avoid;font-weight:bold">' +
+      '<td colspan="' + t.labelSpan + '" style="border:1px solid #9ca3af;padding:6px 8px;text-align:right;background:#fee2e2">' + esc(t.label) + '</td>' +
+      t.values.map((v, k) => '<td style="border:1px solid #9ca3af;padding:6px 8px;text-align:' + (cols[t.labelSpan + k].align || 'left') + ';background:#fee2e2">' + esc(v) + '</td>').join('') + '</tr>';
+    return '<div style="font-family:Sarabun,Tahoma,sans-serif;color:#111;font-size:13px;line-height:1.45">' +
+      '<div style="text-align:center;margin-bottom:10px">' +
+      '<div style="font-size:20px;font-weight:bold;color:#7f1d1d">' + esc(SCHOOL_NAME) + '</div>' +
+      '<div style="font-size:16px;font-weight:bold;margin-top:2px">' + esc(o.title) + '</div>' +
+      '<div style="font-size:14px;margin-top:2px">' + esc(o.subtitle) + '</div>' +
+      '<div style="font-size:12px;color:#555;margin-top:2px">ข้อมูล ณ วันที่ ' + esc(todayTH()) + '</div></div>' +
+      '<table style="border-collapse:collapse;width:100%;font-size:13px"><thead><tr>' + th + '</tr></thead><tbody>' + body + foot + '</tbody></table></div>';
+  }
+
+  async function exportPDF(html, filename) {
+    if (!window.html2pdf) { toast('โหลดตัวสร้าง PDF ไม่สำเร็จ กรุณารีเฟรชหน้า', 'err'); return; }
+    toast('กำลังสร้างไฟล์ PDF…');
+    try {
+      if (document.fonts && document.fonts.load) {
+        await document.fonts.load('400 14px Sarabun');
+        await document.fonts.load('700 14px Sarabun');
+        await document.fonts.ready;
+      }
+    } catch (e) { /* ใช้ฟอนต์สำรอง */ }
+    const el = document.createElement('div');
+    el.style.cssText = 'background:#fff;font-family:Sarabun,sans-serif';
+    el.innerHTML = html;
+    try {
+      await window.html2pdf().set({
+        margin: [12, 10, 14, 10],
+        filename: safeFile(filename) + '.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['css', 'legacy'], avoid: ['tr'] }
+      }).from(el).save();
+      toast('ดาวน์โหลด PDF เรียบร้อย');
+    } catch (e) { toast('สร้าง PDF ไม่สำเร็จ: ' + (e && e.message ? e.message : e), 'err'); }
+  }
+
+  /* ---------- หน้าผู้รับทุน ---------- */
+  let current = null; // { donorName, rows }
+
+  function setState(html, loading) {
+    $('stateBox').innerHTML = loading ? '<div class="spinner"></div>' : html;
+    $('stateBox').classList.remove('hidden');
+    $('tableWrap').classList.add('hidden');
+  }
+
+  function render(rows) {
+    const groups = {};
+    rows.forEach((r) => { (groups[r.grade] = groups[r.grade] || []).push(r); });
+    let html = '', n = 0;
+    Object.keys(groups).map(Number).sort((a, b) => a - b).forEach((g) => {
+      const list = groups[g];
+      html += '<tr class="group-row"><td colspan="6">มัธยมศึกษาปีที่ ' + g + ' <span>(' + list.length + ' คน)</span></td></tr>';
+      list.forEach((r) => {
+        n++;
+        html += '<tr class="row-in" style="animation-delay:' + Math.min(n, 25) * 20 + 'ms">' +
+          '<td class="text-center">' + n + '</td>' +
+          '<td class="font-mono">' + esc(r.student_code) + '</td>' +
+          '<td>' + esc(r.first_name) + '</td>' +
+          '<td>' + esc(r.last_name) + '</td>' +
+          '<td class="text-center"><span class="chip">' + esc(classLabel(r.grade, r.room)) + '</span></td>' +
+          '<td class="text-right font-semibold">' + money(r.amount) + '</td></tr>';
+      });
+    });
+    $('tbody').innerHTML = html;
+    const total = rows.reduce((a, r) => a + Number(r.amount), 0);
+    $('tfTotal').textContent = money(total);
+    $('stateBox').classList.add('hidden');
+    $('tableWrap').classList.remove('hidden');
+    $('statsWrap').classList.remove('hidden');
+    countUp($('stCount'), rows.length, 700);
+    countUp($('stTotal'), total, 1000);
+  }
+
+  async function loadDonors() {
+    const { data, error } = await sb.rpc('public_donors');
+    if (error) { $('donor').innerHTML = '<option value="">โหลดไม่สำเร็จ</option>'; setState('<span class="text-red-600">' + esc(friendlyError(error)) + '</span>'); return; }
+    if (!data.length) { $('donor').innerHTML = '<option value="">ยังไม่มีผู้ให้ทุน</option>'; return; }
+    $('donor').innerHTML = '<option value="">— เลือกผู้ให้ทุน —</option>' +
+      data.map((d) => '<option value="' + esc(d.id) + '">' + esc(d.full_name) + '</option>').join('');
+  }
+
+  async function onSelect() {
+    const id = $('donor').value;
+    current = null;
+    $('btnPdf').disabled = true;
+    $('statsWrap').classList.add('hidden');
+    if (!id) { setState('เลือกผู้ให้ทุนเพื่อดูรายชื่อนักเรียน'); return; }
+    setState('', true);
+    const { data, error } = await sb.rpc('public_recipients_by_donor', { p_donor: id });
+    if (id !== $('donor').value) return; // ผู้ใช้เปลี่ยนตัวเลือกระหว่างโหลด
+    if (error) { setState('<span class="text-red-600">' + esc(friendlyError(error)) + '</span>'); return; }
+    if (!data.length) { setState('ผู้ให้ทุนท่านนี้ยังไม่มีนักเรียนที่ได้รับทุน'); return; }
+    const sel = $('donor');
+    current = { donorName: sel.options[sel.selectedIndex].text, rows: data };
+    render(data);
+    $('btnPdf').disabled = false;
+  }
+
+  function downloadPdf() {
+    if (!current) return;
+    const rows = current.rows;
+    const html = buildReportHTML({
+      title: 'รายชื่อนักเรียนผู้ได้รับทุนการศึกษา',
+      subtitle: 'ผู้ให้ทุน: ' + current.donorName,
+      columns: [
+        { label: 'ที่', align: 'center', width: '7%', get: (r, i) => String(i + 1) },
+        { label: 'รหัสนักเรียน', get: (r) => r.student_code },
+        { label: 'ชื่อ', get: (r) => r.first_name },
+        { label: 'สกุล', get: (r) => r.last_name },
+        { label: 'ชั้น', align: 'center', get: (r) => classLabel(r.grade, r.room) },
+        { label: 'จำนวนเงิน (บาท)', align: 'right', get: (r) => money(r.amount) }
+      ],
+      rows: rows,
+      total: { label: 'รวมทั้งสิ้น ' + rows.length + ' คน', labelSpan: 5, values: [money(rows.reduce((a, r) => a + Number(r.amount), 0))] }
+    });
+    exportPDF(html, 'ผู้รับทุน_' + current.donorName);
+  }
+
+  /* ---------- มุมมองครูที่ปรึกษา ---------- */
+  const ROOM_KEY = 'scholar_teacher_room';
+  let tCur = null; // { label, raw }
+
+  const cmpCode = (a, b) => String(a).localeCompare(String(b), 'th', { numeric: true });
+  const noOf = (r) => (r.class_no == null ? 9999 : r.class_no);
+  function sortTeacherRows(raw) {
+    const byNo = $('sortBy').value === 'no';
+    return raw.slice().sort((x, y) =>
+      (byNo ? noOf(x) - noOf(y) : 0) || cmpCode(x.student_code, y.student_code) || String(x.donor_name).localeCompare(String(y.donor_name), 'th'));
+  }
+  function setStateT(html, loading) {
+    $('stateBoxT').innerHTML = loading ? '<div class="spinner"></div>' : html;
+    $('stateBoxT').classList.remove('hidden');
+    $('tableWrapT').classList.add('hidden');
+  }
+  function renderT() {
+    const rows = sortTeacherRows(tCur.raw);
+    tCur.rows = rows;
+    const codes = new Set();
+    $('tbodyT').innerHTML = rows.map((r, i) => {
+      codes.add(r.student_code);
+      return '<tr class="row-in" style="animation-delay:' + Math.min(i, 25) * 20 + 'ms">' +
+        '<td class="text-center">' + (i + 1) + '</td>' +
+        '<td class="text-center">' + esc(r.class_no == null ? '-' : r.class_no) + '</td>' +
+        '<td class="font-mono">' + esc(r.student_code) + '</td>' +
+        '<td>' + esc((r.first_name + ' ' + r.last_name).trim()) + '</td>' +
+        '<td>' + esc(r.donor_name) + '</td>' +
+        '<td class="text-right font-semibold">' + money(r.amount) + '</td></tr>';
+    }).join('');
+    const total = rows.reduce((a, r) => a + Number(r.amount), 0);
+    $('tfTotalT').textContent = money(total);
+    $('stateBoxT').classList.add('hidden');
+    $('tableWrapT').classList.remove('hidden');
+    $('statsWrapT').classList.remove('hidden');
+    countUp($('stCountT'), codes.size, 700);
+    countUp($('stTotalT'), total, 1000);
+  }
+  async function loadRooms() {
+    const { data, error } = await sb.rpc('public_rooms');
+    if (error) { $('room').innerHTML = '<option value="">โหลดไม่สำเร็จ</option>'; setStateT('<span class="text-red-600">' + esc(friendlyError(error)) + '</span>'); return; }
+    if (!data.length) { $('room').innerHTML = '<option value="">ยังไม่มีข้อมูลห้องเรียน</option>'; return; }
+    $('room').innerHTML = '<option value="">— เลือกห้อง —</option>' +
+      data.map((r) => '<option value="' + r.grade + '-' + r.room + '">' + esc(classLabel(r.grade, r.room)) + '</option>').join('');
+    let saved = null;
+    try { saved = localStorage.getItem(ROOM_KEY); } catch (e) { /* ignore */ }
+    if (saved && Array.from($('room').options).some((o) => o.value === saved)) { $('room').value = saved; onSelectRoom(); }
+  }
+  async function onSelectRoom() {
+    const v = $('room').value;
+    tCur = null;
+    $('btnPdfT').disabled = true;
+    $('statsWrapT').classList.add('hidden');
+    if (!v) { setStateT('เลือกห้องเพื่อดูรายชื่อนักเรียน'); return; }
+    try { localStorage.setItem(ROOM_KEY, v); } catch (e) { /* ignore */ }
+    const p = v.split('-').map(Number);
+    setStateT('', true);
+    const { data, error } = await sb.rpc('public_recipients_by_room', { p_grade: p[0], p_room: p[1] });
+    if (v !== $('room').value) return;
+    if (error) { setStateT('<span class="text-red-600">' + esc(friendlyError(error)) + '</span>'); return; }
+    if (!data.length) { setStateT('ห้องนี้ยังไม่มีนักเรียนที่ได้รับทุน'); return; }
+    tCur = { label: classLabel(p[0], p[1]), raw: data };
+    renderT();
+    $('btnPdfT').disabled = false;
+  }
+  function downloadPdfT() {
+    if (!tCur) return;
+    const rows = tCur.rows;
+    exportPDF(buildReportHTML({
+      title: 'รายชื่อนักเรียนผู้ได้รับทุนการศึกษา',
+      subtitle: 'ห้อง ' + tCur.label,
+      columns: [
+        { label: 'ที่', align: 'center', width: '7%', get: (r, i) => String(i + 1) },
+        { label: 'เลขที่', align: 'center', width: '9%', get: (r) => (r.class_no == null ? '-' : String(r.class_no)) },
+        { label: 'รหัสนักเรียน', get: (r) => r.student_code },
+        { label: 'ชื่อ - สกุล', get: (r) => (r.first_name + ' ' + r.last_name).trim() },
+        { label: 'ผู้ให้ทุน', get: (r) => r.donor_name },
+        { label: 'จำนวนเงิน (บาท)', align: 'right', get: (r) => money(r.amount) }
+      ],
+      rows: rows,
+      total: { label: 'รวมทั้งสิ้น', labelSpan: 5, values: [money(rows.reduce((a, r) => a + Number(r.amount), 0))] }
+    }), 'ผู้รับทุน_' + tCur.label.replace('/', '-'));
+  }
+
+  /* ---------- สลับมุมมอง (#teacher = หน้าครูที่ปรึกษา) ---------- */
+  function showView() {
+    const teacher = location.hash === '#teacher';
+    $('view-donor').classList.toggle('hidden', teacher);
+    $('view-teacher').classList.toggle('hidden', !teacher);
+    $('navDonor').classList.toggle('on', !teacher);
+    $('navTeacher').classList.toggle('on', teacher);
+    $('heroTitle').textContent = teacher ? 'สำหรับครูที่ปรึกษา' : 'ระบบทุนการศึกษา';
+    $('heroSub').textContent = teacher ? 'เลือกห้องของตนเอง เพื่อดูนักเรียนที่ได้รับทุน พร้อมชื่อผู้ให้ทุน' : 'รายชื่อนักเรียนผู้ได้รับทุน แยกตามผู้ให้ทุน';
+    document.title = (teacher ? 'ครูที่ปรึกษา · ' : '') + 'ทุนการศึกษา โรงเรียนพังโคนวิทยาคม';
+  }
+  $('navDonor').addEventListener('click', () => { location.hash = ''; showView(); });
+  $('navTeacher').addEventListener('click', () => { location.hash = 'teacher'; showView(); });
+  window.addEventListener('hashchange', showView);
+  showView();
+
+  if (!configured || !sb) {
+    const msg = '<span class="text-red-600">ยังไม่ได้ตั้งค่า Supabase — กรุณาแก้ SUPABASE_URL และ SUPABASE_ANON_KEY ในไฟล์นี้</span>';
+    $('donor').innerHTML = '<option value="">ยังไม่ได้ตั้งค่า</option>';
+    $('room').innerHTML = '<option value="">ยังไม่ได้ตั้งค่า</option>';
+    setState(msg); setStateT(msg);
+    return;
+  }
+  $('donor').addEventListener('change', onSelect);
+  $('btnPdf').addEventListener('click', downloadPdf);
+  $('room').addEventListener('change', onSelectRoom);
+  $('sortBy').addEventListener('change', () => { if (tCur) renderT(); });
+  $('btnPdfT').addEventListener('click', downloadPdfT);
+  loadDonors();
+  loadRooms();
+})();
+</script>
+</body>
+</html>

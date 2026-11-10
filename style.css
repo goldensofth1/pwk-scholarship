@@ -1,0 +1,82 @@
+/* style.css — ธีมแดง-ขาว + อนิเมชั่น (ใช้ร่วมกับ Tailwind CSS) */
+html { scroll-behavior: smooth; }
+body { font-family: 'Sarabun', system-ui, sans-serif; background: #fff7f7; color: #1f2937; min-height: 100vh; }
+
+/* ---------- พื้นหลังไล่สีเคลื่อนไหว ---------- */
+.hero-bg {
+  background: linear-gradient(120deg, #7f1d1d, #b91c1c, #dc2626, #991b1b);
+  background-size: 300% 300%;
+  animation: gradShift 14s ease infinite;
+}
+@keyframes gradShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+.blob { position: absolute; border-radius: 9999px; filter: blur(42px); opacity: .32; animation: floaty 10s ease-in-out infinite; pointer-events: none; }
+@keyframes floaty { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(24px,-30px) scale(1.12); } }
+
+.bubble { position: absolute; bottom: -20px; width: 14px; height: 14px; border-radius: 9999px; background: rgba(255,255,255,.35); animation: rise 9s linear infinite; pointer-events: none; }
+@keyframes rise { 0% { transform: translateY(0) scale(.6); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(-360px) scale(1.3); opacity: 0; } }
+
+.floaty { display: inline-block; animation: bob 3s ease-in-out infinite; }
+@keyframes bob { 0%,100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-8px) rotate(4deg); } }
+
+/* ---------- การเข้าฉาก ---------- */
+.fade-up { opacity: 0; transform: translateY(14px); animation: fadeUp .6s ease forwards; }
+@keyframes fadeUp { to { opacity: 1; transform: none; } }
+.row-in { opacity: 0; animation: rowIn .45s ease forwards; }
+@keyframes rowIn { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: none; } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pop { from { opacity: 0; transform: scale(.94) translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- คอมโพเนนต์ ---------- */
+.card { background: #fff; border-radius: 1.25rem; border: 1px solid #fee2e2; box-shadow: 0 10px 30px -12px rgba(127,29,29,.25); }
+.field { width: 100%; border: 1.5px solid #fecaca; border-radius: .85rem; padding: .65rem .9rem; background: #fff; outline: none; transition: .2s; font-size: 1rem; }
+.field:focus { border-color: #dc2626; box-shadow: 0 0 0 4px rgba(220,38,38,.15); }
+.lbl { display: block; font-size: .85rem; font-weight: 600; color: #991b1b; margin-bottom: .25rem; }
+
+.btn-primary, .btn-ghost, .btn-danger { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; font-weight: 600; padding: .65rem 1.25rem; border-radius: .85rem; transition: .2s; white-space: nowrap; cursor: pointer; }
+.btn-primary { background: linear-gradient(135deg, #dc2626, #991b1b); color: #fff; box-shadow: 0 6px 16px -6px rgba(185,28,28,.6); }
+.btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 20px -6px rgba(185,28,28,.7); }
+.btn-primary:disabled { opacity: .45; cursor: not-allowed; }
+.btn-ghost { background: #fff; color: #b91c1c; border: 1.5px solid #fca5a5; }
+.btn-ghost:hover { background: #fef2f2; }
+.btn-danger { background: #fff; color: #b91c1c; border: 1.5px solid #fca5a5; }
+.btn-danger:hover { background: #b91c1c; color: #fff; }
+.btn-sm { padding: .3rem .7rem; font-size: .85rem; border-radius: .6rem; }
+
+.shine { position: relative; overflow: hidden; }
+.shine::after { content: ''; position: absolute; top: 0; left: -120%; width: 55%; height: 100%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.45), transparent); transform: skewX(-20deg); animation: shine 3.6s infinite; }
+@keyframes shine { to { left: 160%; } }
+
+.tbl { width: 100%; border-collapse: collapse; font-size: .95rem; }
+:where(.tbl thead th) { text-align: left; }
+.tbl thead th { background: #b91c1c; color: #fff; padding: .7rem .75rem; font-weight: 600; white-space: nowrap; }
+.tbl td { padding: .6rem .75rem; border-bottom: 1px solid #fee2e2; vertical-align: middle; }
+.tbl tbody tr:hover { background: #fef2f2; }
+.tbl tfoot td { background: #fee2e2; font-weight: 700; color: #7f1d1d; padding: .7rem .75rem; }
+.group-row td { background: #fee2e2; color: #7f1d1d; font-weight: 700; }
+.group-row td span { font-weight: 500; font-size: .85rem; opacity: .8; }
+
+.chip { display: inline-block; padding: .1rem .6rem; border-radius: 999px; background: #fee2e2; color: #991b1b; font-weight: 600; font-size: .85rem; }
+.stat { background: linear-gradient(135deg, #fff, #fef2f2); border: 1px solid #fecaca; border-radius: 1rem; padding: .9rem 1rem; }
+.stat b { display: block; font-size: 1.5rem; color: #b91c1c; line-height: 1.2; }
+.stat span { font-size: .8rem; color: #6b7280; }
+
+.progress { height: .5rem; background: #fee2e2; border-radius: 999px; overflow: hidden; min-width: 80px; }
+.progress > i { display: block; height: 100%; background: linear-gradient(90deg, #ef4444, #b91c1c); border-radius: 999px; transition: width .8s ease; }
+
+.spinner { width: 2rem; height: 2rem; border: 3px solid #fecaca; border-top-color: #dc2626; border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto; }
+.empty-box { padding: 2.5rem 1rem; text-align: center; color: #9ca3af; }
+
+.tab-btn { padding: .6rem 1.1rem; border-radius: 999px; font-weight: 600; color: #b91c1c; background: #fff; border: 1.5px solid #fecaca; transition: .2s; cursor: pointer; }
+.tab-btn:hover { background: #fef2f2; }
+.tab-active, .tab-active:hover { background: linear-gradient(135deg, #dc2626, #991b1b); color: #fff; border-color: transparent; }
+
+/* ---------- Modal ---------- */
+.modal { position: fixed; inset: 0; z-index: 60; display: none; align-items: center; justify-content: center; padding: 1rem; background: rgba(69,10,10,.55); backdrop-filter: blur(3px); }
+.modal.open { display: flex; animation: fadeIn .2s; }
+.modal-box { background: #fff; border-radius: 1.25rem; width: 100%; max-width: 34rem; max-height: 92vh; overflow: auto; animation: pop .25s ease; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
